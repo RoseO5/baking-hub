@@ -2,6 +2,66 @@
 
 import Link from "next/link";
 
+const questions = [
+  "why-cake-sinks",
+  "why-cake-not-rising",
+  "why-cake-dry",
+  "why-cake-dense",
+  "why-cake-cracks",
+  "why-cake-sticky",
+  "why-cake-flat",
+  "why-cake-burns",
+  "why-cake-undercooked",
+  "why-cake-collapses",
+
+  "why-puff-puff-hard",
+  "why-puff-puff-oily",
+  "why-puff-puff-flat",
+  "why-puff-puff-burns",
+  "why-puff-puff-not-rising",
+
+  "how-to-measure-flour",
+  "how-to-preheat-oven",
+  "how-to-mix-batter",
+  "how-to-check-cake-done",
+  "how-to-store-cake",
+
+  "why-bread-dense",
+  "why-bread-hard",
+  "why-bread-not-rising",
+
+  "why-cookies-hard",
+  "why-cookies-soft",
+
+  "why-icing-runny",
+  "why-icing-hard",
+
+  "why-cake-sticks-pan",
+  "how-to-grease-pan",
+
+  "why-cake-bitter",
+  "why-cake-too-sweet",
+
+  "why-cake-heavy",
+  "why-cake-light",
+
+  "why-cake-wet",
+  "why-cake-dry-edges",
+
+  "why-butter-not-creaming",
+  "why-eggs-curdle",
+
+  "why-mixture-lumpy",
+  "why-mixture-thin",
+
+  "why-cake-smells-egg",
+  "why-cake-no-flavor",
+
+  "why-oven-not-heating",
+  "why-cake-rises-one-side",
+  "why-batter-curdled"
+];
+
 export default function Home() {
   return (
     <main className="p-6">
@@ -14,14 +74,16 @@ export default function Home() {
       </p>
 
       <ul className="mt-6 space-y-2">
-        <li><Link href="/questions/why-cake-sinks">Why does my cake sink?</Link></li>
-        <li><Link href="/questions/why-puff-puff-hard">Why is my puff puff hard?</Link></li>
-        <li><Link href="/questions/why-cake-not-rising">Why is my cake not rising?</Link></li>
-        <li><Link href="/questions/why-cake-dry">Why is my cake dry?</Link></li>
-        <li><Link href="/questions/how-to-measure-flour">How to measure flour</Link></li>
+        {questions.map((q) => (
+          <li key={q}>
+            <Link href={`/questions/${q}`}>
+              {q.replace(/-/g, " ")}
+            </Link>
+          </li>
+        ))}
       </ul>
 
-      {/* 👇 FORM */}
+      {/* FORM */}
       <form
         className="mt-10"
         onSubmit={async (e) => {
