@@ -1,66 +1,7 @@
 "use client";
 
 import Link from "next/link";
-
-const questions = [
-  "why-cake-sinks",
-  "why-cake-not-rising",
-  "why-cake-dry",
-  "why-cake-dense",
-  "why-cake-cracks",
-  "why-cake-sticky",
-  "why-cake-flat",
-  "why-cake-burns",
-  "why-cake-undercooked",
-  "why-cake-collapses",
-
-  "why-puff-puff-hard",
-  "why-puff-puff-oily",
-  "why-puff-puff-flat",
-  "why-puff-puff-burns",
-  "why-puff-puff-not-rising",
-
-  "how-to-measure-flour",
-  "how-to-preheat-oven",
-  "how-to-mix-batter",
-  "how-to-check-cake-done",
-  "how-to-store-cake",
-
-  "why-bread-dense",
-  "why-bread-hard",
-  "why-bread-not-rising",
-
-  "why-cookies-hard",
-  "why-cookies-soft",
-
-  "why-icing-runny",
-  "why-icing-hard",
-
-  "why-cake-sticks-pan",
-  "how-to-grease-pan",
-
-  "why-cake-bitter",
-  "why-cake-too-sweet",
-
-  "why-cake-heavy",
-  "why-cake-light",
-
-  "why-cake-wet",
-  "why-cake-dry-edges",
-
-  "why-butter-not-creaming",
-  "why-eggs-curdle",
-
-  "why-mixture-lumpy",
-  "why-mixture-thin",
-
-  "why-cake-smells-egg",
-  "why-cake-no-flavor",
-
-  "why-oven-not-heating",
-  "why-cake-rises-one-side",
-  "why-batter-curdled"
-];
+import { questions } from "@/data/questions";
 
 export default function Home() {
   return (
@@ -74,10 +15,10 @@ export default function Home() {
       </p>
 
       <ul className="mt-6 space-y-2">
-        {questions.map((q) => (
+        {Object.keys(questions).map((q) => (
           <li key={q}>
             <Link href={`/questions/${q}`}>
-              {q.replace(/-/g, " ")}
+              {questions[q].title}
             </Link>
           </li>
         ))}
