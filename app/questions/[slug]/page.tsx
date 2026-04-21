@@ -3,9 +3,11 @@ import StudentOffer from "@/components/StudentOffer";
 import { questions } from "@/data/questions";
 
 const isStudent = false;
+const COURSE_LINK = "https://selar.com/62771693d7";
 
 export default function QuestionPage({ params }: { params: { slug: string } }) {
-  const data = questions[params.slug];
+  const key = params.slug as keyof typeof questions;
+  const data = questions[key];
 
   return (
     <main className="p-6">
@@ -18,16 +20,13 @@ export default function QuestionPage({ params }: { params: { slug: string } }) {
       </p>
 
       {/* 💰 COURSE CTA */}
-      <div className="mt-6 p-4 bg-green-100 rounded">
+      <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
         <p className="font-bold">
           Want to bake perfectly every time?
         </p>
         <p>
-          Get my full baking course here 👉 [YOUR COURSE LINK]
-        </p>
-      </div>
-
-      {isStudent ? <StudentOffer /> : <AdBlock />}
-    </main>
-  );
-}
+          Get my full baking course here 👉{" "}
+          <a
+            href={COURSE_LINK}
+            target="_blank"
+            rel
