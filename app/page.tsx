@@ -15,13 +15,17 @@ export default function Home() {
       </p>
 
       <ul className="mt-6 space-y-2">
-        {Object.keys(questions).map((q) => (
-          <li key={q}>
-            <Link href={`/questions/${q}`}>
-              {questions[q].title}
-            </Link>
-          </li>
-        ))}
+        {Object.keys(questions).map((q) => {
+          const key = q as keyof typeof questions;
+
+          return (
+            <li key={q}>
+              <Link href={`/questions/${q}`}>
+                {questions[key].title}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
 
       {/* FORM */}
