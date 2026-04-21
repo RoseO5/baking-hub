@@ -24,9 +24,21 @@ export default function QuestionPage({ params }: { params: { slug: string } }) {
         <p className="font-bold">
           Want to bake perfectly every time?
         </p>
+
         <p>
           Get my full baking course here 👉{" "}
           <a
             href={COURSE_LINK}
             target="_blank"
-            rel
+            rel="noopener noreferrer"
+            className="text-green-700 underline font-semibold"
+          >
+            Enroll Now
+          </a>
+        </p>
+      </div>
+
+      {isStudent ? <StudentOffer /> : <AdBlock />}
+    </main>
+  );
+}
