@@ -1,21 +1,28 @@
 import { supabase } from "@/lib/supabase";
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  const { question } = await req.json();
 
-  const { question } = body;
-
-  if (!question) {
-    return new Response("No question provided", { status: 400 });
-  }
-
-  const { error } = await supabase.from("questions").insert([
-    { question }
-  ]);
+  const { error } = await supabase
+    .from("questions")
+    .insert([{ question }]);
 
   if (error) {
-    return new Response("Error saving question", { status: 500 });
+    return Response.json({ error: error.message });
   }
 
-  return new Response("Saved successfully", { status: 200 });
+  return Response.json({ message: "Saved to database" });
+}
+
+export async function GET() {
+  const { data, error } = await supabase
+    .from("questions")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return Response.json({ error: error.message });
+  }
+
+  return Response.json(data);
 }
