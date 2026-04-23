@@ -3,15 +3,18 @@ import { supabase } from "@/lib/supabase";
 export async function POST(req: Request) {
   const { question } = await req.json();
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("questions")
-    .insert([{ question }]);
+    .insert([{ question }])
+    .select();
+
+  console.log("INSERT RESULT:", { data, error });
 
   if (error) {
-    return Response.json({ error: error.message });
+    return Response.json({ success: false, error: error.message });
   }
 
-  return Response.json({ message: "Saved to database" });
+  return Response.json({ success: true, data });
 }
 
 export async function GET() {
@@ -19,6 +22,8 @@ export async function GET() {
     .from("questions")
     .select("*")
     .order("created_at", { ascending: false });
+
+  console.log("FETCH RESULT:", { data, error });
 
   if (error) {
     return Response.json({ error: error.message });
