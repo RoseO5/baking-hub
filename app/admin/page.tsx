@@ -31,6 +31,30 @@ export default function AdminPage() {
     }
   };
 
+  const approve = async (id: number) => {
+    await fetch("/api/admin/approve", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    });
+
+    loadQuestions();
+  };
+
+  const reject = async (id: number) => {
+    await fetch("/api/admin/reject", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    });
+
+    loadQuestions();
+  };
+
   if (!authorized) {
     return <p className="p-6">Checking access...</p>;
   }
@@ -52,10 +76,31 @@ export default function AdminPage() {
       <div className="mt-6 space-y-4">
         {questions.map((q) => (
           <div key={q.id} className="p-4 border rounded">
-            <p>{q.question}</p>
+            <p className="font-medium">{q.question}</p>
+
             <p className="text-xs text-gray-500">
               {new Date(q.created_at).toLocaleString()}
             </p>
+
+            <p className="text-sm mt-1">
+              Status: <span className="font-bold">{q.status}</span>
+            </p>
+
+            <div className="mt-3 space-x-2">
+              <button
+                onClick={() => approve(q.id)}
+                className="bg-green-500 text-white px-3 py-1 rounded"
+              >
+                Approve
+              </button>
+
+              <button
+                onClick={() => reject(q.id)}
+                className="bg-red-500 text-white px-3 py-1 rounded"
+              >
+                Reject
+              </button>
+            </div>
           </div>
         ))}
       </div>
