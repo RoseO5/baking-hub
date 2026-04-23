@@ -37,14 +37,13 @@ export default function Home() {
           const formData = new FormData(e.currentTarget);
           const question = formData.get("question");
 
-          const res = await fetch("/api/questions", {
+          await fetch("/api/questions", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ question }),
           });
 
-          const result = await res.json();
-          alert(JSON.stringify(result));
+          alert("Question submitted!");
         }}
       >
         <h2 className="font-bold mb-2">Ask a Baking Question</h2>
