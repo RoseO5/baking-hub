@@ -6,7 +6,7 @@ export async function POST(req: Request) {
 
     const { data, error } = await supabase
       .from("questions")
-      .insert([{ question }])
+      .insert([{ question, status: "pending" }])
       .select();
 
     return Response.json({ data, error });
@@ -18,7 +18,9 @@ export async function POST(req: Request) {
 export async function GET() {
   const { data, error } = await supabase
     .from("questions")
-    .select("*");
+    .select("*")
+    .eq("status", "approved")
+    .order("created_at", { ascending: false });
 
   return Response.json({ data, error });
 }
