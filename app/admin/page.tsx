@@ -8,6 +8,7 @@ export default function AdminPage() {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
   const [questions, setQuestions] = useState<any[]>([]);
+  const [loadingId, setLoadingId] = useState<number | null>(null);
 
   useEffect(() => {
     const isAdmin = localStorage.getItem("isAdmin");
@@ -32,27 +33,59 @@ export default function AdminPage() {
   };
 
   const approve = async (id: number) => {
-    await fetch("/api/admin/approve", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id }),
-    });
+    try {
+      setLoadingId(id);
 
-    loadQuestions();
+      const res = await fetch("/api/admin/approve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      const result = await res.json();
+
+      if (result.error) {
+        alert("Error: " + result.error);
+      } else {
+        alert("Approved successfully ✅");
+      }
+
+      loadQuestions();
+    } catch (err) {
+      alert("Approve failed ❌");
+    } finally {
+      setLoadingId(null);
+    }
   };
 
   const reject = async (id: number) => {
-    await fetch("/api/admin/reject", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id }),
-    });
+    try {
+      setLoadingId(id);
 
-    loadQuestions();
+      const res = await fetch("/api/admin/reject", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      const result = await res.json();
+
+      if (result.error) {
+        alert("Error: " + result.error);
+      } else {
+        alert("Rejected successfully ❌");
+      }
+
+      loadQuestions();
+    } catch (err) {
+      alert("Reject failed ❌");
+    } finally {
+      setLoadingId(null);
+    }
   };
 
   if (!authorized) {
@@ -89,16 +122,18 @@ export default function AdminPage() {
             <div className="mt-3 space-x-2">
               <button
                 onClick={() => approve(q.id)}
+                disabled={loadingId === q.id}
                 className="bg-green-500 text-white px-3 py-1 rounded"
               >
-                Approve
+                {loadingId === q.id ? "Processing..." : "Approve"}
               </button>
 
               <button
                 onClick={() => reject(q.id)}
+                disabled={loadingId === q.id}
                 className="bg-red-500 text-white px-3 py-1 rounded"
               >
-                Reject
+                {loadingId === q.id ? "Processing..." : "Reject"}
               </button>
             </div>
           </div>
