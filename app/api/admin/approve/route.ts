@@ -3,10 +3,11 @@ import { supabase } from "@/lib/supabase";
 export async function POST(req: Request) {
   const { id } = await req.json();
 
-  await supabase
+  const { data, error } = await supabase
     .from("questions")
     .update({ status: "approved" })
-    .eq("id", id);
+    .eq("id", id)
+    .select();
 
-  return Response.json({ message: "Approved" });
+  return Response.json({ data, error });
 }
