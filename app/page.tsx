@@ -1,29 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
-export default function AdminPage() {
-  const router = useRouter();
-  const [authorized, setAuthorized] = useState(false);
+export default function Home() {
   const [questions, setQuestions] = useState<any[]>([]);
 
   useEffect(() => {
-    const isAdmin = localStorage.getItem("isAdmin");
-
-    if (!isAdmin) {
-      router.push("/admin/login");
-    } else {
-      setAuthorized(true);
-      loadQuestions();
-    }
+    loadQuestions();
   }, []);
 
   const loadQuestions = async () => {
     const { data, error } = await supabase
       .from("questions")
       .select("*")
+      .eq("status", "approved")
       .order("created_at", { ascending: false });
 
     if (!error && data) {
@@ -31,97 +23,75 @@ export default function AdminPage() {
     }
   };
 
-  // ✅ APPROVE WITH DEBUG + SAFE UPDATE
-  const approve = async (id: number) => {
-    try {
-      const res = await fetch("/api/admin/approve", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: Number(id) }), // ensure correct type
-      });
-
-      const result = await res.json();
-      alert(JSON.stringify(result));
-
-      await loadQuestions();
-    } catch (err) {
-      alert("Approve failed");
-      console.error(err);
-    }
-  };
-
-  // ❌ REJECT WITH DEBUG + SAFE UPDATE
-  const reject = async (id: number) => {
-    try {
-      const res = await fetch("/api/admin/reject", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: Number(id) }),
-      });
-
-      const result = await res.json();
-      alert(JSON.stringify(result));
-
-      await loadQuestions();
-    } catch (err) {
-      alert("Reject failed");
-      console.error(err);
-    }
-  };
-
-  if (!authorized) {
-    return <p className="p-6">Checking access...</p>;
-  }
-
   return (
     <main className="p-6">
-      <h1 className="text-2xl font-bold">Admin Dashboard 🧑‍🍳</h1>
+      <h1 className="text-2xl font-bold">
+        Welcome to Rosie’s Baking Hub 🍰
+      </h1>
 
-      <button
-        onClick={() => {
-          localStorage.removeItem("isAdmin");
-          router.push("/admin/login");
-        }}
-        className="mt-2 text-sm underline"
-      >
-        Logout
-      </button>
+      <p className="mt-4">
+        Find answers to your baking problems and improve your skills.
+      </p>
 
-      <div className="mt-6 space-y-4">
+      <ul className="mt-6 space-y-2">
         {questions.map((q) => (
-          <div key={q.id} className="p-4 border rounded">
-            <p className="font-medium">{q.question}</p>
-
-            <p className="text-xs text-gray-500">
-              {new Date(q.created_at).toLocaleString()}
-            </p>
-
-            <p className="text-sm mt-1">
-              Status: <span className="font-bold">{q.status}</span>
-            </p>
-
-            <div className="mt-3 space-x-2">
-              <button
-                onClick={() => approve(q.id)}
-                className="bg-green-500 text-white px-3 py-1 rounded"
-              >
-                Approve
-              </button>
-
-              <button
-                onClick={() => reject(q.id)}
-                className="bg-red-500 text-white px-3 py-1 rounded"
-              >
-                Reject
-              </button>
-            </div>
-          </div>
+          <li key={q.id}>
+            <Link href={`/questions/${q.id}`}>
+              {q.question}
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
+
+      {/* FORM */}
+      <form
+        className="mt-10"
+        onSubmit={async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(e.currentTarget);
+          const question = formData.get("question");
+
+          try {
+            const res = await fetch("/api/questions", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ question }),
+            });
+
+            const result = await res.json();
+
+            if (result.error) {
+              alert("Error: " + result.error);
+            } else {
+              alert("Question submitted!");
+
+              // Optional: refresh approved questions
+              loadQuestions();
+
+              // Optional: clear input
+              (e.target as HTMLFormElement).reset();
+            }
+          } catch (err) {
+            alert("Something went wrong");
+            console.error(err);
+          }
+        }}
+      >
+        <h2 className="font-bold mb-2">Ask a Baking Question</h2>
+
+        <input
+          name="question"
+          placeholder="Type your question..."
+          className="border p-2 w-full"
+        />
+
+        <button className="mt-2 bg-black text-white px-4 py-2">
+          Submit
+        </button>
+      </form>
     </main>
   );
 }
