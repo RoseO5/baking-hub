@@ -1,13 +1,17 @@
 import { supabase } from "@/lib/supabase";
 
 export async function POST(req: Request) {
-  const { id } = await req.json();
+  try {
+    const { id } = await req.json();
 
-  const { data, error } = await supabase
-    .from("questions")
-    .update({ status: "approved" })
-    .eq("id", id)
-    .select();
+    const { data, error } = await supabase
+      .from("questions")
+      .update({ status: "approved" })
+      .eq("id", id)
+      .select();
 
-  return Response.json({ data, error });
+    return Response.json({ data, error });
+  } catch (err) {
+    return Response.json({ error: "Server crashed", details: err });
+  }
 }
