@@ -29,10 +29,6 @@ export default function Home() {
         Welcome to Rosie’s Baking Hub 🍰
       </h1>
 
-      <p className="mt-4">
-        Find answers to your baking problems and improve your skills.
-      </p>
-
       <ul className="mt-6 space-y-2">
         {questions.map((q) => (
           <li key={q.id}>
@@ -47,10 +43,14 @@ export default function Home() {
       <form
         className="mt-10"
         onSubmit={async (e) => {
+          alert("Form clicked"); // 🔥 STEP 1: confirm click
+
           e.preventDefault();
 
           const formData = new FormData(e.currentTarget);
           const question = formData.get("question");
+
+          alert("Sending: " + question); // 🔥 STEP 2
 
           try {
             const res = await fetch("/api/questions", {
@@ -61,21 +61,15 @@ export default function Home() {
               body: JSON.stringify({ question }),
             });
 
+            alert("Request sent"); // 🔥 STEP 3
+
             const result = await res.json();
 
-            if (result.error) {
-              alert("Error: " + result.error);
-            } else {
-              alert("Question submitted!");
+            alert("Response: " + JSON.stringify(result)); // 🔥 STEP 4
 
-              // Optional: refresh approved questions
-              loadQuestions();
-
-              // Optional: clear input
-              (e.target as HTMLFormElement).reset();
-            }
+            loadQuestions();
           } catch (err) {
-            alert("Something went wrong");
+            alert("CRASH: " + err);
             console.error(err);
           }
         }}
@@ -88,7 +82,10 @@ export default function Home() {
           className="border p-2 w-full"
         />
 
-        <button className="mt-2 bg-black text-white px-4 py-2">
+        <button
+          type="submit"
+          className="mt-2 bg-black text-white px-4 py-2"
+        >
           Submit
         </button>
       </form>
