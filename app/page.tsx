@@ -1,63 +1,127 @@
 "use client";
 
-import Link from "next/link";
-import { questions } from "@/data/questions";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
-export default function Home() {
+export default function AdminPage() {
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
+  const [questions, setQuestions] = useState<any[]>([]);
+
+  useEffect(() => {
+    const isAdmin = localStorage.getItem("isAdmin");
+
+    if (!isAdmin) {
+      router.push("/admin/login");
+    } else {
+      setAuthorized(true);
+      loadQuestions();
+    }
+  }, []);
+
+  const loadQuestions = async () => {
+    const { data, error } = await supabase
+      .from("questions")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setQuestions(data);
+    }
+  };
+
+  // ✅ APPROVE WITH DEBUG + SAFE UPDATE
+  const approve = async (id: number) => {
+    try {
+      const res = await fetch("/api/admin/approve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: Number(id) }), // ensure correct type
+      });
+
+      const result = await res.json();
+      alert(JSON.stringify(result));
+
+      await loadQuestions();
+    } catch (err) {
+      alert("Approve failed");
+      console.error(err);
+    }
+  };
+
+  // ❌ REJECT WITH DEBUG + SAFE UPDATE
+  const reject = async (id: number) => {
+    try {
+      const res = await fetch("/api/admin/reject", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: Number(id) }),
+      });
+
+      const result = await res.json();
+      alert(JSON.stringify(result));
+
+      await loadQuestions();
+    } catch (err) {
+      alert("Reject failed");
+      console.error(err);
+    }
+  };
+
+  if (!authorized) {
+    return <p className="p-6">Checking access...</p>;
+  }
+
   return (
     <main className="p-6">
-      <h1 className="text-2xl font-bold">
-        Welcome to Rosie’s Baking Hub 🍰
-      </h1>
+      <h1 className="text-2xl font-bold">Admin Dashboard 🧑‍🍳</h1>
 
-      <p className="mt-4">
-        Find answers to your baking problems and improve your skills.
-      </p>
-
-      <ul className="mt-6 space-y-2">
-        {Object.keys(questions).map((q) => {
-          const key = q as keyof typeof questions;
-
-          return (
-            <li key={q}>
-              <Link href={`/questions/${q}`}>
-                {questions[key].title}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-
-      {/* FORM */}
-      <form
-        className="mt-10"
-        onSubmit={async (e) => {
-          e.preventDefault();
-
-          const formData = new FormData(e.currentTarget);
-          const question = formData.get("question");
-
-          await fetch("/api/questions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ question }),
-          });
-
-          alert("Question submitted!");
+      <button
+        onClick={() => {
+          localStorage.removeItem("isAdmin");
+          router.push("/admin/login");
         }}
+        className="mt-2 text-sm underline"
       >
-        <h2 className="font-bold mb-2">Ask a Baking Question</h2>
+        Logout
+      </button>
 
-        <input
-          name="question"
-          placeholder="Type your question..."
-          className="border p-2 w-full"
-        />
+      <div className="mt-6 space-y-4">
+        {questions.map((q) => (
+          <div key={q.id} className="p-4 border rounded">
+            <p className="font-medium">{q.question}</p>
 
-        <button className="mt-2 bg-black text-white px-4 py-2">
-          Submit
-        </button>
-      </form>
+            <p className="text-xs text-gray-500">
+              {new Date(q.created_at).toLocaleString()}
+            </p>
+
+            <p className="text-sm mt-1">
+              Status: <span className="font-bold">{q.status}</span>
+            </p>
+
+            <div className="mt-3 space-x-2">
+              <button
+                onClick={() => approve(q.id)}
+                className="bg-green-500 text-white px-3 py-1 rounded"
+              >
+                Approve
+              </button>
+
+              <button
+                onClick={() => reject(q.id)}
+                className="bg-red-500 text-white px-3 py-1 rounded"
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </main>
   );
 }
