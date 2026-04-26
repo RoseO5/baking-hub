@@ -46,8 +46,8 @@ export default function AdminPage() {
 
       const result = await res.json();
 
-      if (result.error) {
-        alert("Error: " + result.error);
+      if (JSON.stringify(result.error)) {
+        alert("Error: " + JSON.stringify(result.error));
       } else {
         alert("Approved successfully ✅");
       }
@@ -74,8 +74,8 @@ export default function AdminPage() {
 
       const result = await res.json();
 
-      if (result.error) {
-        alert("Error: " + result.error);
+      if (JSON.stringify(result.error)) {
+        alert("Error: " + JSON.stringify(result.error));
       } else {
         alert("Rejected successfully ❌");
       }
