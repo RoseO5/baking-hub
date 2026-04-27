@@ -83,10 +83,17 @@ export default function Home() {
               </>
             )}
 
-            {/* CTA */}
-            <p className="text-sm mt-3 text-blue-600">
-              Want to bake like a pro? Join Rosie’s course 🍰
-            </p>
+            {/* 🔥 HIGH-CONVERTING CTA */}
+            {(isStudent || unlocked[q.id]) && (
+              <a
+                href="https://selar.com/62771693d"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-3 bg-green-600 text-white px-4 py-2 rounded"
+              >
+                🔥 Get My Complete Baking Course (Step-by-Step)
+              </a>
+            )}
           </div>
         ))}
       </div>
