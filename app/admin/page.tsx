@@ -46,7 +46,7 @@ export default function AdminPage() {
 
       const result = await res.json();
 
-      if (JSON.stringify(result.error)) {
+      if (result.error) {
         alert("Error: " + JSON.stringify(result.error));
       } else {
         alert("Approved successfully ✅");
@@ -74,7 +74,7 @@ export default function AdminPage() {
 
       const result = await res.json();
 
-      if (JSON.stringify(result.error)) {
+      if (result.error) {
         alert("Error: " + JSON.stringify(result.error));
       } else {
         alert("Rejected successfully ❌");
@@ -85,6 +85,31 @@ export default function AdminPage() {
       alert("Reject failed ❌");
     } finally {
       setLoadingId(null);
+    }
+  };
+
+  // ✅ NEW: Save Answer
+  const saveAnswer = async (id: number, answer: string) => {
+    try {
+      const res = await fetch("/api/admin/answer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id, answer }),
+      });
+
+      const result = await res.json();
+
+      if (result.error) {
+        alert("Error: " + JSON.stringify(result.error));
+      } else {
+        alert("Answer saved ✅");
+      }
+
+      loadQuestions();
+    } catch (err) {
+      alert("Failed to save answer ❌");
     }
   };
 
@@ -119,6 +144,15 @@ export default function AdminPage() {
               Status: <span className="font-bold">{q.status}</span>
             </p>
 
+            {/* ✅ ANSWER INPUT */}
+            <textarea
+              placeholder="Write answer..."
+              defaultValue={q.answer || ""}
+              onBlur={(e) => saveAnswer(q.id, e.target.value)}
+              className="border p-2 w-full mt-2"
+            />
+
+            {/* BUTTONS */}
             <div className="mt-3 space-x-2">
               <button
                 onClick={() => approve(q.id)}
