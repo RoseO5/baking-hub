@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 export default function Home() {
   const [questions, setQuestions] = useState<any[]>([]);
+  const [unlocked, setUnlocked] = useState<any>({});
+  const [adsCount, setAdsCount] = useState(0);
 
   useEffect(() => {
     loadQuestions();
@@ -23,34 +24,85 @@ export default function Home() {
     }
   };
 
+  const unlockAnswer = (id: number) => {
+    if (adsCount < 3) {
+      alert("Watch ad to unlock answer 🎥");
+
+      setTimeout(() => {
+        setUnlocked((prev: any) => ({ ...prev, [id]: true }));
+        setAdsCount((prev) => prev + 1);
+        alert("Answer unlocked ✅");
+      }, 1500);
+    } else {
+      setUnlocked((prev: any) => ({ ...prev, [id]: true }));
+    }
+  };
+
+  const isStudent = false;
+
   return (
     <main className="p-6">
       <h1 className="text-2xl font-bold">
         Welcome to Rosie’s Baking Hub 🍰
       </h1>
 
-      <ul className="mt-6 space-y-2">
+      {/* QUESTIONS WITH ANSWERS */}
+      <div className="mt-6 space-y-4">
         {questions.map((q) => (
-          <li key={q.id}>
-            <Link href={`/questions/${q.id}`}>
-              {q.question}
-            </Link>
-          </li>
-        ))}
-      </ul>
+          <div key={q.id} className="border p-4 rounded">
+            <p className="font-bold">{q.question}</p>
 
-      {/* FORM */}
+            {/* STUDENT */}
+            {isStudent && (
+              <p className="mt-2">{q.answer}</p>
+            )}
+
+            {/* FREE USER */}
+            {!isStudent && (
+              <>
+                {unlocked[q.id] ? (
+                  <p className="mt-2">{q.answer}</p>
+                ) : (
+                  <>
+                    <p className="mt-2 text-gray-500">
+                      {q.answer
+                        ? q.answer.slice(0, 60) + "..."
+                        : "No answer yet"}
+                    </p>
+
+                    {q.answer && (
+                      <button
+                        onClick={() => unlockAnswer(q.id)}
+                        className="mt-2 bg-black text-white px-3 py-1"
+                      >
+                        Unlock Answer
+                      </button>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+
+            {/* CTA */}
+            <p className="text-sm mt-3 text-blue-600">
+              Want to bake like a pro? Join Rosie’s course 🍰
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* FORM (UNCHANGED + DEBUG SAFE) */}
       <form
         className="mt-10"
         onSubmit={async (e) => {
-          alert("Form clicked"); // 🔥 STEP 1: confirm click
+          alert("Form clicked");
 
           e.preventDefault();
 
           const formData = new FormData(e.currentTarget);
           const question = formData.get("question");
 
-          alert("Sending: " + question); // 🔥 STEP 2
+          alert("Sending: " + question);
 
           try {
             const res = await fetch("/api/questions", {
@@ -61,11 +113,11 @@ export default function Home() {
               body: JSON.stringify({ question }),
             });
 
-            alert("Request sent"); // 🔥 STEP 3
+            alert("Request sent");
 
             const result = await res.json();
 
-            alert("Response: " + JSON.stringify(result)); // 🔥 STEP 4
+            alert("Response: " + JSON.stringify(result));
 
             loadQuestions();
           } catch (err) {
