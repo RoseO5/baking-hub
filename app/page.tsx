@@ -86,7 +86,7 @@ export default function Home() {
             {/* 🔥 HIGH-CONVERTING CTA */}
             {(isStudent || unlocked[q.id]) && (
               <a
-                href="https://selar.com/62771693d"
+                href="https://selar.com/62771693d7"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block mt-3 bg-green-600 text-white px-4 py-2 rounded"
