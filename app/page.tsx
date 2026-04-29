@@ -152,7 +152,7 @@ export default function Home() {
 <p className="text-lg font-semibold">Ready to stop guessing and start baking confidently?</p>
 <a href="https://selar.com/62771693d7?source=app_bottom" target="_blank" className="inline-block mt-3 bg-black text-white px-6 py-3 rounded">🍰 Get Full Baking Course</a>
 <p className="text-xs text-gray-500 mt-2">⭐ Loved by beginners learning from scratch</p>
-<a href="https://wa.me/2348142750728?text=Hi%20I%20came%20from%20your%20baking%20app%20and%20I%20want%20help%20with%20the%20course" target="_blank" className="inline-block mt-3 bg-green-600 text-white px-4 py-2 rounded">💬 Talk to me on WhatsApp</a>
+<a href="https://wa.me/2348142750728?text=Hi%20I%20want%20to%20learn%20cake%20baking%20step%20by%20step%20and%20I%20am%20interested%20in%20your%20course" target="_blank" className="inline-block mt-3 bg-green-600 text-white px-4 py-2 rounded">💬 Talk to me on WhatsApp</a>
 </div>
 </main>
   );
