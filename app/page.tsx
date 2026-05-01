@@ -8,6 +8,10 @@ export default function Home() {
   const [unlocked, setUnlocked] = useState<any>({});
   const [adsCount, setAdsCount] = useState(0);
 
+  // NEW (safe UI feedback)
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     loadQuestions();
   }, []);
@@ -26,15 +30,16 @@ export default function Home() {
 
   const unlockAnswer = (id: number) => {
     if (adsCount < 3) {
-      alert("🎬 Quick step before unlock: you are doing great!");
+      setMessage("🎬 Quick step before unlocking… you’re doing great!");
 
       setTimeout(() => {
         setUnlocked((prev: any) => ({ ...prev, [id]: true }));
         setAdsCount((prev) => prev + 1);
-        alert("Answer unlocked ✅");
+        setMessage("🎉 Answer unlocked — keep learning!");
       }, 1500);
     } else {
       setUnlocked((prev: any) => ({ ...prev, [id]: true }));
+      setMessage("🎉 Answer unlocked");
     }
   };
 
@@ -45,6 +50,11 @@ export default function Home() {
       <h1 className="text-2xl font-bold">
         Welcome to Rosie’s Baking Hub 🍰
       </h1>
+
+      {/* 🔔 GLOBAL MESSAGE */}
+      {message && (
+        <p className="mt-3 text-green-600 text-sm">{message}</p>
+      )}
 
       {/* QUESTIONS WITH ANSWERS */}
       <div className="mt-6 space-y-4">
@@ -61,7 +71,12 @@ export default function Home() {
             {!isStudent && (
               <>
                 {unlocked[q.id] ? (
-                  <p className="mt-2">{q.answer}</p>
+                  <>
+                    <p className="mt-2">{q.answer}</p>
+                    <p className="text-xs text-purple-600 mt-2">
+                      💡 This is how real bakers improve step by step
+                    </p>
+                  </>
                 ) : (
                   <>
                     <p className="mt-2 text-gray-500">
@@ -73,7 +88,7 @@ export default function Home() {
                     {q.answer && (
                       <button
                         onClick={() => unlockAnswer(q.id)}
-                        className="mt-2 bg-black text-white px-3 py-1"
+                        className="mt-2 bg-black text-white px-3 py-1 rounded"
                       >
                         🎉 Unlock Answer — You are learning like a pro
                       </button>
@@ -83,7 +98,7 @@ export default function Home() {
               </>
             )}
 
-            {/* 🔥 HIGH-CONVERTING CTA */}
+            {/* CTA */}
             {(isStudent || unlocked[q.id]) && (
               <a
                 href="https://selar.com/62771693d7?source=app"
@@ -98,20 +113,19 @@ export default function Home() {
         ))}
       </div>
 
-      {/* FORM (UNCHANGED + DEBUG SAFE) */}
+      {/* FORM */}
       <form
         className="mt-10"
         onSubmit={async (e) => {
-          alert("Form clicked");
-
           e.preventDefault();
 
           const formData = new FormData(e.currentTarget);
           const question = formData.get("question");
 
-          alert("Sending: " + question);
-
           try {
+            setLoading(true);
+            setMessage("Submitting your question...");
+
             const res = await fetch("/api/questions", {
               method: "POST",
               headers: {
@@ -120,16 +134,19 @@ export default function Home() {
               body: JSON.stringify({ question }),
             });
 
-            alert("Request sent");
-
             const result = await res.json();
 
-            alert("Response: " + JSON.stringify(result));
-
-            loadQuestions();
+            if (result.error) {
+              setMessage("❌ Failed to submit. Try again.");
+            } else {
+              setMessage("✅ Question submitted successfully!");
+              loadQuestions();
+            }
           } catch (err) {
-            alert("CRASH: " + err);
             console.error(err);
+            setMessage("❌ Something went wrong.");
+          } finally {
+            setLoading(false);
           }
         }}
       >
@@ -143,17 +160,39 @@ export default function Home() {
 
         <button
           type="submit"
+          disabled={loading}
           className="mt-2 bg-black text-white px-4 py-2"
         >
-          Submit
+          {loading ? "Submitting..." : "Submit"}
         </button>
       </form>
-    <div className="mt-12 text-center">
-<p className="text-lg font-semibold">Ready to stop guessing and start baking confidently?</p>
-<a href="https://selar.com/62771693d7?source=app_bottom" target="_blank" className="inline-block mt-3 bg-black text-white px-6 py-3 rounded">🍰 Get Full Baking Course</a>
-<p className="text-xs text-gray-500 mt-2">⭐ Loved by beginners learning from scratch</p>
-<a href="https://wa.me/2348142750728?text=Hi%20I%20want%20to%20learn%20cake%20baking%20step%20by%20step%20and%20I%20am%20interested%20in%20your%20course" target="_blank" className="inline-block mt-3 bg-green-600 text-white px-4 py-2 rounded">💬 Talk to me on WhatsApp</a>
-</div>
-</main>
+
+      {/* BOTTOM CTA */}
+      <div className="mt-12 text-center">
+        <p className="text-lg font-semibold">
+          Ready to stop guessing and start baking confidently?
+        </p>
+
+        <a
+          href="https://selar.com/62771693d7?source=app_bottom"
+          target="_blank"
+          className="inline-block mt-3 bg-black text-white px-6 py-3 rounded"
+        >
+          🍰 Get Full Baking Course
+        </a>
+
+        <p className="text-xs text-gray-500 mt-2">
+          ⭐ Loved by beginners learning from scratch
+        </p>
+
+        <a
+          href="https://wa.me/2348142750728?text=Hi%20I%20want%20to%20learn%20cake%20baking%20step%20by%20step%20and%20I%20am%20interested%20in%20your%20course"
+          target="_blank"
+          className="inline-block mt-3 bg-green-600 text-white px-4 py-2 rounded"
+        >
+          💬 Talk to me on WhatsApp
+        </a>
+      </div>
+    </main>
   );
 }
