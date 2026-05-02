@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function GET() {
   return Response.json({ message: "Approve route is working" });
@@ -8,14 +8,25 @@ export async function POST(req: Request) {
   try {
     const { id } = await req.json();
 
-    const { data, error } = await supabase
+    if (!id) {
+      return Response.json({ error: "Missing ID" }, { status: 400 });
+    }
+
+    const { data, error } = await supabaseAdmin
       .from("questions")
       .update({ status: "approved" })
       .eq("id", Number(id))
       .select();
 
-    return Response.json({ data, error });
+    if (error) {
+      return Response.json({ error }, { status: 500 });
+    }
+
+    return Response.json({ data });
   } catch (err) {
-    return Response.json({ error: "Server crashed", details: err });
+    return Response.json(
+      { error: "Server crashed", details: err },
+      { status: 500 }
+    );
   }
 }
